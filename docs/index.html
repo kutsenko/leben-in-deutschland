@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leben in Deutschland – Übungstrainer</title>
+  <meta name="description" content="Barrierefreier Übungstrainer für den Test Leben in Deutschland, Baden-Württemberg">
+  <meta name="theme-color" content="#0b3d91">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="LiD Trainer">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <p>Leben in Deutschland · Baden-Württemberg</p>
+  </header>
+  <main id="main">
+    <h1>Übungstrainer wird geladen …</h1>
+    <noscript><p>Bitte JavaScript aktivieren, um den Übungstrainer zu benutzen.</p></noscript>
+  </main>
+  <!-- Ansagen für Screenreader -->
+  <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <div id="alert" class="sr-only" role="alert" aria-atomic="true"></div>
+  <script src="fragen.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

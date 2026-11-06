@@ -1,0 +1,5 @@
+# Heruntergeladene Rohdaten (z. B. BAMF-PDF) nicht versionieren
+data/raw/
+*.pdf
+node_modules/
+.DS_Store
