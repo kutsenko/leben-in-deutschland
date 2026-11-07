@@ -64,8 +64,8 @@ h1:focus-visible, [tabindex="-1"]:focus-visible { outline: 3px solid var(--focus
 h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; }
 h3 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
 
-.q-nr { display: block; font-size: 1rem; font-weight: 600; color: var(--muted); }
-.q-text { display: block; margin-top: 0.25rem; }
+.q-nr { font-size: 1rem; font-weight: 600; color: var(--muted); }
+.q-text { display: inline-block; margin-top: 0.25rem; }
 
 .bild {
   border-left: 4px solid var(--accent);
@@ -111,7 +111,8 @@ button.primary { background: var(--accent); color: var(--accent-fg); font-weight
 .feedback.ok { background: var(--ok-bg); border: 2px solid var(--ok-border); }
 .feedback.bad { background: var(--bad-bg); border: 2px solid var(--bad-border); }
 
-.nav { display: grid; gap: 0.75rem; grid-template-columns: 1fr 1fr; margin-top: 1.5rem; }
+.nav { display: grid; gap: 0.75rem; grid-template-columns: 1fr 1fr; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.nav-single { margin-top: 1.5rem; }
 .nav .wide { grid-column: 1 / -1; }
 
 .muted { color: var(--muted); }

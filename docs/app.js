@@ -200,18 +200,18 @@
     const head = (modeName ? `${modeName}: ` : "") + `Frage ${practice.idx + 1} von ${total}` +
       (showNr ? ` (${katalogNr(q)})` : "");
     render(`
-      <h1 id="q-h"><span class="q-nr">${esc(head)}</span> <span class="q-text">${esc(q.frage)}</span></h1>
+      <h1 id="q-h"><span class="q-nr">${esc(head)}</span><br><span class="q-text">${esc(q.frage)}</span></h1>
       ${bild ? `<p class="bild"><strong>Bildbeschreibung:</strong> ${esc(bild)}</p>` : ""}
-      <div class="answers" role="group" aria-label="Antworten">
+      <ol class="answers" role="list" aria-label="Antworten">
         ${labels.map((l, i) => `
-          <button class="answer" data-i="${i}"><span class="letter">${LETTERS[i]}:</span> ${esc(l)}<span class="mark"></span></button>`).join("")}
-      </div>
+          <li><button class="answer" data-i="${i}"><span class="letter">${LETTERS[i]}:</span> ${esc(l)}<span class="mark"></span></button></li>`).join("")}
+      </ol>
       <p id="feedback" class="feedback" tabindex="-1"></p>
-      <div class="nav">
-        <button class="primary wide" data-act="next">${practice.idx + 1 < total ? "Nächste Frage" : "Fertig – zur Startseite"}</button>
-        <button data-act="prev" ${practice.idx ? "" : 'aria-disabled="true"'}>Vorherige Frage</button>
-        <button data-act="home">Zur Startseite</button>
-      </div>
+      <ul class="nav" role="list" aria-label="Navigation">
+        <li class="wide"><button class="primary" data-act="next">${practice.idx + 1 < total ? "Nächste Frage" : "Fertig – zur Startseite"}</button></li>
+        <li><button data-act="prev" ${practice.idx ? "" : 'aria-disabled="true"'}>Vorherige Frage</button></li>
+        <li><button data-act="home">Zur Startseite</button></li>
+      </ul>
     `, `Frage ${practice.idx + 1} von ${total}`);
     main.querySelectorAll(".answer").forEach((b) =>
       b.addEventListener("click", () => answerPractice(Number(b.dataset.i))));
@@ -276,7 +276,7 @@
         </div>
         <button class="primary" type="submit">Frage anzeigen</button>
       </form>
-      <div class="nav"><button class="wide" data-act="home">Zur Startseite</button></div>
+      <p class="nav-single"><button data-act="home">Zur Startseite</button></p>
     `, "Frage aufrufen");
     on("home", showStart);
     document.getElementById("goto-form").addEventListener("submit", (e) => {
@@ -344,17 +344,17 @@
     const total = ex.ids.length;
     const answeredCount = Object.keys(ex.answers).length;
     render(`
-      <h1 id="q-h"><span class="q-nr">Prüfung: Frage ${idx + 1} von ${total}</span> <span class="q-text">${esc(q.frage)}</span></h1>
+      <h1 id="q-h"><span class="q-nr">Prüfung: Frage ${idx + 1} von ${total}</span><br><span class="q-text">${esc(q.frage)}</span></h1>
       ${bild ? `<p class="bild"><strong>Bildbeschreibung:</strong> ${esc(bild)}</p>` : ""}
-      <div class="answers" role="group" aria-label="Antworten">
+      <ol class="answers" role="list" aria-label="Antworten">
         ${labels.map((l, i) => `
-          <button class="answer" data-i="${i}" aria-pressed="${chosen === i}"><span class="letter">${LETTERS[i]}:</span> ${esc(l)}</button>`).join("")}
-      </div>
-      <div class="nav">
-        <button class="primary wide" data-act="next">${idx + 1 < total ? `Weiter zu Frage ${idx + 2}` : "Zur Übersicht und Abgabe"}</button>
-        <button data-act="prev" ${idx ? "" : 'aria-disabled="true"'}>Zurück</button>
-        <button data-act="overview">Übersicht</button>
-      </div>
+          <li><button class="answer" data-i="${i}" aria-pressed="${chosen === i}"><span class="letter">${LETTERS[i]}:</span> ${esc(l)}</button></li>`).join("")}
+      </ol>
+      <ul class="nav" role="list" aria-label="Navigation">
+        <li class="wide"><button class="primary" data-act="next">${idx + 1 < total ? `Weiter zu Frage ${idx + 2}` : "Zur Übersicht und Abgabe"}</button></li>
+        <li><button data-act="prev" ${idx ? "" : 'aria-disabled="true"'}>Zurück</button></li>
+        <li><button data-act="overview">Übersicht</button></li>
+      </ul>
       <p id="restzeit" class="muted">Restzeit: ${minutesLeft()} Minuten</p>
       <p class="muted">${answeredCount} von ${total} Fragen beantwortet.</p>
     `, `Prüfung Frage ${idx + 1} von ${total}`);
@@ -415,11 +415,11 @@
       <h1>Ergebnis: ${passed ? "Bestanden" : "Nicht bestanden"}</h1>
       <p>Sie haben ${correct} von ${ex.ids.length} Fragen richtig beantwortet.
          Zum Bestehen sind mindestens ${EXAM_PASS} richtige Antworten nötig.</p>
-      <div class="menu">
-        ${wrong.length ? `<button class="primary" data-act="practice-wrong">Diese ${wrong.length} Fragen jetzt üben</button>` : ""}
-        <button data-act="exam">Neue Prüfung</button>
-        <button data-act="home">Zur Startseite</button>
-      </div>
+      <ul class="menu" role="list">
+        ${wrong.length ? `<li><button class="primary" data-act="practice-wrong">Diese ${wrong.length} Fragen jetzt üben</button></li>` : ""}
+        <li><button data-act="exam">Neue Prüfung</button></li>
+        <li><button data-act="home">Zur Startseite</button></li>
+      </ul>
       ${wrong.length ? `<h2>Falsch oder nicht beantwortet (${wrong.length})</h2>
         ${wrong.map(({ q, a }) => {
           const { bild, labels } = prepare(q);
@@ -465,7 +465,7 @@
             : `<p>Antwort: <strong>${esc(labels[q.richtig])}</strong></p>`}
         </div>`;
       }).join("")}
-      <div class="nav"><button class="wide" data-act="home">Zur Startseite</button></div>
+      <p class="nav-single"><button data-act="home">Zur Startseite</button></p>
     `, "Alle Fragen");
     on("home", showStart);
     const rerender = () => showList(document.getElementById("list-filter").value, document.getElementById("list-all").checked);
@@ -503,7 +503,7 @@
       <p>Fragen, Antworten und Bildbeschreibungen: Bundesamt für Migration und Flüchtlinge (BAMF),
          Gesamtfragenkatalog zum Test „Leben in Deutschland“ und zum „Einbürgerungstest“, Stand 07.05.2025.
          Ohne Gewähr.</p>
-      <div class="nav"><button class="wide" data-act="home">Zur Startseite</button></div>
+      <p class="nav-single"><button data-act="home">Zur Startseite</button></p>
     `, "Hilfe");
     on("home", showStart);
   }
@@ -517,7 +517,7 @@
       <p>${knownCount()} von ${FRAGEN.length} Fragen zuletzt richtig, ${wrongIds().length} zuletzt falsch,
          ${newIds().length} noch nicht beantwortet. Der Fortschritt wird nur auf diesem Gerät gespeichert.</p>
       <button data-act="reset">Fortschritt löschen</button>
-      <div class="nav"><button class="wide" data-act="home">Zur Startseite</button></div>
+      <p class="nav-single"><button data-act="home">Zur Startseite</button></p>
     `, "Einstellungen");
     document.getElementById("set-sound").addEventListener("change", (e) => {
       store.settings.sound = e.target.checked;
