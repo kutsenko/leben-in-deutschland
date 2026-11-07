@@ -24,8 +24,15 @@ selbst im Fragenkatalog mitliefert.
 - Fortschritt wird auf dem Gerät gespeichert, ohne Konto und ohne Server
 
 ## Benutzen
-- **Online:** Den Ordner `docs/` über GitHub Pages veröffentlichen (Einstellungen → Pages →
-  Branch `main`, Ordner `/docs`) und den Link an die Nutzerin geben.
+**👉 Zum Trainer: https://kutsenko.github.io/leben-in-deutschland/**
+
+- **iPhone:** Den Link in Safari öffnen, dann „Teilen“ und „Zum Home-Bildschirm“ wählen.
+  Danach startet der Trainer wie eine App und funktioniert auch ohne Internet.
+- **PC:** Den Link im Browser öffnen und als Lesezeichen speichern.
+- Der Fortschritt wird pro Gerät gespeichert, iPhone und PC zählen also getrennt.
+
+Veröffentlicht wird der Ordner `docs/` über GitHub Pages (Branch `main`, Ordner `/docs`).
+Jeder Push auf `main` aktualisiert die Seite automatisch.
 - **Lokal am PC:** `docs/index.html` im Browser öffnen. Das funktioniert auch ohne Server,
   nur der Offline-Speicher ist dann nicht aktiv.
 - Zum Testen mit Server: `cd docs && python3 -m http.server 8000` und dann http://localhost:8000 öffnen.
