@@ -113,6 +113,8 @@ button.primary { background: var(--accent); color: var(--accent-fg); font-weight
 
 .nav { display: grid; gap: 0.75rem; grid-template-columns: 1fr 1fr; margin: 1.5rem 0 0; padding: 0; list-style: none; }
 .nav-single { margin-top: 1.5rem; }
+.ai-primary { margin: 1rem 0 0; }
+.ai-more { margin-top: 0.5rem; }
 .nav .wide { grid-column: 1 / -1; }
 
 .muted { color: var(--muted); }

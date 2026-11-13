@@ -1,6 +1,6 @@
 // Service Worker: speichert den Trainer für die Nutzung ohne Internet.
 // Bei Änderungen an den Dateien VERSION erhöhen.
-const VERSION = "lid-bw-2";
+const VERSION = "lid-bw-3";
 const FILES = ["./", "index.html", "style.css", "app.js", "fragen.js", "manifest.webmanifest",
   "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 

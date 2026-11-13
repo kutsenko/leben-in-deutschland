@@ -19,7 +19,12 @@ selbst im Fragenkatalog mitliefert.
 - **Liste aller Fragen mit Antworten** zum Durchhören (jede Frage ist eine Überschrift, man springt mit
   dem Rotor bzw. mit der Taste H weiter)
 - Sofortige Rückmeldung, die vorgelesen wird, optional mit Tönen für richtig und falsch
-- Tastenkürzel am PC: 1–4 / A–D wählt eine Antwort, N oder → nächste Frage, ← vorherige, Esc zur Startseite
+- **Erklärung von einer KI** nach dem Beantworten (und im Prüfungsergebnis): Auf dem iPhone öffnet
+  sich das Teilen-Menü. Dort wählt man ChatGPT, Claude, Gemini o. Ä., und die App öffnet sich mit
+  Frage, Antworten, BAMF-Lösung und der eigenen Antwort. Die KI wird gebeten, die Antwort vorlesefreundlich
+  zu erklären, Hintergrundwissen zu geben und eine Eselsbrücke zu nennen. Ersatzwege: „Text für
+  die KI kopieren“ und „In ChatGPT öffnen (Webseite)“. Am PC gibt es dafür die Taste K.
+- Tastenkürzel am PC: 1–4 / A–D wählt eine Antwort, N oder → nächste Frage, ← vorherige, K KI-Erklärung, Esc zur Startseite
 - Funktioniert offline, auf dem iPhone über Safari mit „Teilen“ und „Zum Home-Bildschirm“ wie eine App
 - Fortschritt wird auf dem Gerät gespeichert, ohne Konto und ohne Server
 

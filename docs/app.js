@@ -207,11 +207,13 @@
           <li><button class="answer" data-i="${i}"><span class="letter">${LETTERS[i]}:</span> ${esc(l)}<span class="mark"></span></button></li>`).join("")}
       </ol>
       <p id="feedback" class="feedback" tabindex="-1"></p>
+      <div id="ai-primary"></div>
       <ul class="nav" role="list" aria-label="Navigation">
         <li class="wide"><button class="primary" data-act="next">${practice.idx + 1 < total ? "Nächste Frage" : "Fertig – zur Startseite"}</button></li>
         <li><button data-act="prev" ${practice.idx ? "" : 'aria-disabled="true"'}>Vorherige Frage</button></li>
         <li><button data-act="home">Zur Startseite</button></li>
       </ul>
+      <div id="ai-more"></div>
     `, `Frage ${practice.idx + 1} von ${total}`);
     main.querySelectorAll(".answer").forEach((b) =>
       b.addEventListener("click", () => answerPractice(Number(b.dataset.i))));
@@ -239,7 +241,107 @@
     fb.textContent = ok
       ? (labels[i].length > 80 ? `Richtig! Antwort ${LETTERS[i]}.` : `Richtig! ${LETTERS[i]}: ${labels[i]}`)
       : `Leider falsch. Richtig ist ${LETTERS[q.richtig]}: ${labels[q.richtig]}`;
+    // KI-Erklärung anbieten: Hauptknopf direkt unter der Rückmeldung,
+    // weitere Möglichkeiten unter der Navigation (damit „Nächste Frage“ schnell erreichbar bleibt)
+    const attrs = `data-q="${q.id}" data-chosen="${i}"`;
+    document.getElementById("ai-primary").innerHTML = aiPrimaryHtml(attrs);
+    document.getElementById("ai-more").innerHTML = `<h2>Weitere KI-Möglichkeiten</h2>` + aiMoreHtml(attrs);
+    bindAiButtons(main);
     fb.focus();
+  }
+
+  /* ---------- KI-Erklärung (über das Teilen-Menü des Geräts) ---------- */
+
+  /** Text für die KI: Frage, Antworten, offizielle Lösung und die eigene Antwort. */
+  function buildAiPrompt(q, chosen) {
+    const { bild, labels } = prepare(q);
+    const nr = q.land ? `Baden-Württemberg-Frage ${q.nr}` : `Frage ${q.nr}`;
+    const lines = [
+      "Ich lerne für den Test „Leben in Deutschland“ (Bundesland Baden-Württemberg). " +
+      "Ich bin blind und nutze einen Screenreader. Bitte antworte in einfachem Deutsch, " +
+      "in kurzen Absätzen, ohne Tabellen, Emojis, Überschriften-Zeichen oder Aufzählungszeichen.",
+      "",
+      `${nr}: ${q.frage}`,
+    ];
+    if (bild) lines.push(`Bildbeschreibung: ${bild}`);
+    labels.forEach((l, i) => lines.push(`${LETTERS[i]}: ${l}`));
+    lines.push("", `Richtige Antwort laut BAMF: ${LETTERS[q.richtig]}`);
+    if (chosen === undefined || chosen === null) {
+      lines.push("Ich habe keine Antwort gegeben.", "",
+        `Erkläre mir, warum ${LETTERS[q.richtig]} richtig ist und warum die anderen Antworten falsch sind.`);
+    } else if (chosen === q.richtig) {
+      lines.push(`Meine Antwort war ${LETTERS[chosen]}, also richtig.`, "",
+        `Erkläre mir kurz, warum ${LETTERS[q.richtig]} richtig ist.`);
+    } else {
+      lines.push(`Meine Antwort war ${LETTERS[chosen]}, also falsch.`, "",
+        `Erkläre mir, warum ${LETTERS[q.richtig]} richtig ist und warum ${LETTERS[chosen]} falsch ist.`);
+    }
+    lines.push("Gib mir dazu etwas Hintergrundwissen und eine Eselsbrücke, damit ich mir die Antwort merke. " +
+      "Die offizielle Antwort des BAMF gilt; stelle sie nicht in Frage.");
+    return lines.join("\n");
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      // Ersatzweg für ältere Browser oder fehlende Berechtigung
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+      ta.remove();
+      return ok;
+    }
+  }
+
+  async function copyForAi(text) {
+    const ok = await copyText(text);
+    announce(ok
+      ? "Text kopiert. Öffnen Sie jetzt ChatGPT oder eine andere KI und fügen Sie den Text ein."
+      : "Kopieren hat nicht geklappt.", !ok);
+  }
+
+  /** Öffnet das Teilen-Menü (iPhone: ChatGPT, Claude, Gemini … auswählen); sonst Kopieren. */
+  async function shareToAi(text) {
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+        return;
+      } catch (e) {
+        if (e && e.name === "AbortError") return; // Nutzerin hat abgebrochen
+      }
+    }
+    copyForAi(text);
+  }
+
+  const chatGptUrl = (text) => "https://chatgpt.com/?q=" + encodeURIComponent(text);
+
+  /** Schaltflächen für die KI-Erklärung; data-ai-* verweisen auf Frage und eigene Antwort. */
+  function aiPrimaryHtml(attrs) {
+    return `<p class="ai-primary"><button data-ai="share" ${attrs}>Erklärung von der KI holen</button></p>`;
+  }
+  function aiMoreHtml(attrs) {
+    return `<ul class="menu ai-more" role="list">
+        <li><button data-ai="copy" ${attrs}>Text für die KI kopieren</button></li>
+        <li><button data-ai="chatgpt" ${attrs}>In ChatGPT öffnen (Webseite)</button></li>
+      </ul>`;
+  }
+  function bindAiButtons(root) {
+    root.querySelectorAll("[data-ai]").forEach((b) => b.addEventListener("click", () => {
+      const q = BY_ID.get(Number(b.dataset.q));
+      const chosen = b.dataset.chosen === "" ? null : Number(b.dataset.chosen);
+      const text = buildAiPrompt(q, chosen);
+      if (b.dataset.ai === "share") shareToAi(text);
+      else if (b.dataset.ai === "copy") copyForAi(text);
+      else window.open(chatGptUrl(text), "_blank", "noopener");
+    }));
   }
 
   function nextPractice() {
@@ -428,9 +530,11 @@
             ${bild ? `<p class="bild"><strong>Bildbeschreibung:</strong> ${esc(bild)}</p>` : ""}
             <p>Ihre Antwort: ${a === undefined ? "keine" : esc(LETTERS[a] + ": " + labels[a])}</p>
             <p><strong>Richtig: ${esc(LETTERS[q.richtig] + ": " + labels[q.richtig])}</strong></p>
+            ${aiPrimaryHtml(`data-q="${q.id}" data-chosen="${a === undefined ? "" : a}"`)}
           </div>`;
         }).join("")}` : ""}
     `, "Prüfungsergebnis");
+    bindAiButtons(main);
     on("practice-wrong", () => startPractice(wrong.map((w) => w.q.id), 0, "wrong"));
     on("exam", startExam);
     on("home", showStart);
@@ -492,10 +596,19 @@
       <ul>
         <li>Mit der Tabulatortaste zu den Antworten gehen und mit der Eingabetaste auswählen.</li>
         <li>Tastenkürzel: 1 bis 4 oder A bis D wählt eine Antwort, N oder Pfeil rechts geht zur nächsten Frage,
-            Pfeil links zur vorherigen, Escape zur Startseite.</li>
+            Pfeil links zur vorherigen, K holt eine Erklärung von der KI, Escape zur Startseite.</li>
         <li>Bei NVDA und JAWS funktionieren die Tastenkürzel nur im Fokusmodus
             (NVDA: NVDA-Taste plus Leertaste umschalten). Tab und Eingabetaste funktionieren immer.</li>
       </ul>
+      <h2>Erklärungen von einer KI</h2>
+      <p>Nach dem Beantworten einer Frage gibt es den Knopf „Erklärung von der KI holen“, am PC auch die Taste K.
+         Auf dem iPhone öffnet sich das Teilen-Menü. Dort wählen Sie Ihre KI-App, zum Beispiel ChatGPT, Claude oder Gemini.
+         Die App öffnet sich mit der Frage, den Antworten, der richtigen Lösung und Ihrer Antwort. Die KI erklärt dann
+         die Antwort, gibt Hintergrundwissen und eine Eselsbrücke. Je nach App müssen Sie den Text noch absenden.</p>
+      <p>Fehlt Ihre KI-App im Teilen-Menü, tippen Sie dort auf „Mehr“ oder nutzen Sie „Text für die KI kopieren“
+         und fügen den Text in der KI-App ein. „In ChatGPT öffnen“ öffnet die ChatGPT-Webseite mit der Frage.
+         Es werden nur die Frage und Ihre Antwort weitergegeben, keine persönlichen Daten.
+         KI-Antworten können Fehler enthalten. Maßgeblich ist immer die Lösung des BAMF.</p>
       <h2>Bilder</h2>
       <p>Bei Fragen mit Bildern, zum Beispiel zu Wappen oder Flaggen, werden die Bildbeschreibungen des
          Bundesamts für Migration und Flüchtlinge vorgelesen. Bei Bildantworten steht die Beschreibung direkt in der Antwort.</p>
@@ -551,6 +664,9 @@
     } else if (k === "arrowleft" && main.querySelector('[data-act="prev"]')) {
       e.preventDefault();
       main.querySelector('[data-act="prev"]').click();
+    } else if (k === "k" && main.querySelector('[data-ai="share"]')) {
+      e.preventDefault();
+      main.querySelector('[data-ai="share"]').click();
     } else if (k === "escape") {
       e.preventDefault();
       showStart();
